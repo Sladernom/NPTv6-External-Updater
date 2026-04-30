@@ -10,7 +10,7 @@ Test carefully before using in production or on critical systems.
 I am bad at coding. This may or may not break things.
 
 ## Implementation
-This shell script is meant to hook into `/var/etc/dhcp6c_wan_script.sh` to grab the prefix delegation at the point a lease is established.
+This shell script is meant to hook into `/var/etc/dhcp6c_wan_script.sh`(not my code) to grab the prefix delegation at the point a lease is established.
 I place it within this section:
 ```sh
     if [ ${REASON} != "INFOREQ" -a -n "${PDINFO}" ]; then
