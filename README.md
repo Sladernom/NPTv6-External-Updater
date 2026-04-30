@@ -23,7 +23,7 @@ I place it within this section:
             /usr/bin/logger -t dhcp6c "dhcp6c_script: ${REASON} on igc1 prefix now ${PDINFO}"
 
             # Custom NPTv6 update script
-            /usr/local/sbin/update_nptv6.sh "$PDINFO"
+            /usr/local/sbin/update_nptv6.sh "$PDINFO" # <--- RIGHT HERE
 
             if [ -z "${FORCE}" ]; then
                 FORCE=${REASON}
