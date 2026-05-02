@@ -16,18 +16,34 @@
 # first <npt>
 ##############################################################################
 
-# Lock to prevent race conditions
+# Lock to prevent race conditions / concurrency
 # Open shared lock file and assign it to file descriptor 9 (this process only)
 exec 9>/tmp/npt_update.lock || {
   logger -p daemon.err -t npt-update "Can't open lock file /tmp/npt_update.lock, skipping run"
   exit 0
 }
 # Attempts to acquire exclusive lock on the file referenced by FD 9
-# Lock is per-process; if another process holds it, this fails immediately (-n)
+# Lock is per-process; if another process holds it this fails immediately (-n)
 if ! flock -n 9; then
   logger -p daemon.info -t npt-update "Another process holds the lock, another instance likely running"
   exit 0
 fi
+
+# Throttle runs to once every 15 seconds
+THROTTLE_FILE="/tmp/npt_update.last"
+INTERVAL=15
+NOW=$(date +%s)
+
+if [ -f "$THROTTLE_FILE" ]; then
+  LAST=$(cat "$THROTTLE_FILE" 2>/dev/null)
+
+  if [ -n "$LAST" ] && [ $((NOW - LAST)) -lt $INTERVAL ]; then
+    logger -p daemon.info -t npt-update "Throttled (last run $((NOW - LAST))s ago)"
+    exit 0
+  fi
+fi
+echo "$NOW" > "$THROTTLE_FILE"
+
 # Previous critical fail check
 if [ -f /conf/npt_update_failed ]; then
   logger -p daemon.crit -t npt-update "Previous critical failure detected, refusing to run"
@@ -41,7 +57,7 @@ fi
 
 PDINFO="$1"
 # Flag I may use in the future to disable some non-critical loggers
-# OLOG="1"
+# OLOG=1
 
 if [ -z "$PDINFO" ]; then
   logger -p daemon.err -t npt-update "No PDINFO provided, exiting"
