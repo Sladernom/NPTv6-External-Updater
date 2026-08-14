@@ -10,7 +10,7 @@ This script is provided **as-is**, without any warranties. Use at your own risk.
 I am not responsible for any damages, data loss, or issues caused by running this script. 
 Test carefully before using in production or on critical systems.
 
-I am bad at coding. This may or may not break things.
+I am bad at coding. This didn't break things for me but it might for you.
 
 ## Implementation
 This shell script is meant to hook into `/var/etc/dhcp6c_wan_script.sh`(not my code) to grab the prefix delegation `"$PDINFO"` at the point a lease is established.
